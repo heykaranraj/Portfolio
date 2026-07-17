@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchQuery: '',
     selectedTag: 'ALL',
     sortOrder: 'newest',
-    viewLayout: localStorage.getItem('blog-layout') || 'list', // 'grid' or 'list'
+    viewLayout: localStorage.getItem('blog-layout') || 'grid', // 'grid' or 'list'
     theme: localStorage.getItem('theme') || 'light'
   };
 

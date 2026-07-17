@@ -562,6 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let particles = [];
     let mouse = { x: null, y: null, radius: 150 };
+    let currentRGB = { r: 139, g: 115, b: 85 };
     
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -612,16 +613,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       
-      draw() {
-        // Resolve active colors matching our theme palette
-        const isDark = document.body.hasAttribute('data-theme');
-        const particleColor = isDark 
-          ? `rgba(245, 158, 11, ${this.alpha})` // soft amber in dark mode
-          : `rgba(139, 115, 85, ${this.alpha})`; // soft warm brown in light mode
-          
+      draw(r, g, b) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = particleColor;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.alpha})`;
         ctx.fill();
       }
     }
@@ -637,14 +632,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw lines between close particles to build dynamic constellations
+      // Determine active target colors matching our theme palette
       const isDark = document.body.hasAttribute('data-theme');
-      const lineColorBase = isDark ? '245, 158, 11' : '139, 115, 85';
+      const targetRGB = isDark ? { r: 245, g: 158, b: 11 } : { r: 139, g: 115, b: 85 };
+      
+      // Smooth color interpolation over animation frames
+      currentRGB.r += (targetRGB.r - currentRGB.r) * 0.08;
+      currentRGB.g += (targetRGB.g - currentRGB.g) * 0.08;
+      currentRGB.b += (targetRGB.b - currentRGB.b) * 0.08;
+      
+      const r = Math.round(currentRGB.r);
+      const g = Math.round(currentRGB.g);
+      const b = Math.round(currentRGB.b);
       const maxDistance = 120;
       
       for (let i = 0; i < particles.length; i++) {
         particles[i].update();
-        particles[i].draw();
+        particles[i].draw(r, g, b);
         
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -656,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(${lineColorBase}, ${alphaVal})`;
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alphaVal})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }

@@ -97,17 +97,27 @@ body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   line-height: 1.6;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
   opacity: 0.9;
-  
-  /* Technical Blueprint Grid Pattern background */
+}
+
+/* Background blueprint grid separated to prevent transition flashes */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  pointer-events: none;
   background-image: 
-    radial-gradient(circle at 50% 25%, transparent 20%, var(--bg-color) 80%),
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 80px 80px;
-  background-attachment: fixed;
+  mask-image: radial-gradient(circle at 50% 25%, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 25%, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 80%);
 }
 
 .container {

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zachary Proser — Writing, Essays, and Technical Field Notes</title>
+  <meta name="description"
+    content="Technical tutorials, field notes on applied AI, and developer writing from a long stretch shipping production systems.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Dynamic Interactive Background Canvas -->
+  <canvas id="bg-canvas" class="bg-canvas"></canvas>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar animate-slide-down" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo" id="nav-logo">
+        Karan<span>S</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#" class="nav-item active" id="nav-blogs-link">Blogs</a>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Wrapper -->
+  <main class="container">
+
+    <!-- Blogs Index Section -->
+    <section id="blogs-index-view">
+
+      <!-- Hero Section -->
+      <div class="hero">
+        <div class="hero-tagline animate-fade-in-up delay-1">Learning. Building. Shipping.</div>
+        <h1 class="animate-fade-in-up delay-2">Learning in public.<br><span>Building in public.</span></h1>
+        <p class="hero-desc animate-fade-in-up delay-3">
+          Documenting what I learn while building AI, writing code, launching products, and exploring new ideas.
+        </p>
+
+      </div>
+
+      <!-- Toolbar Controls -->
+      <div class="toolbar animate-fade-in-up delay-4">
+        <div class="search-box">
+          <span class="search-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+              </path>
+            </svg>
+          </span>
+          <input type="text" class="search-input" id="search-input" placeholder="Search..."
+            autocomplete="off">
+          <span class="search-shortcut">⌘K</span>
+        </div>
+
+        <div class="toolbar-controls">
+          <!-- Toggle Filter Panel Button -->
+          <button class="filter-toggle-btn" id="filter-toggle-btn" aria-label="Toggle filters">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="filter-toggle-icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            Filter
+          </button>
+
+          <div class="post-count" id="current-count-display">5 posts</div>
+
+          <!-- Grid/List layout toggle -->
+          <div class="layout-switch">
+            <button class="layout-btn" id="layout-grid-btn" aria-label="Grid View">
+              <svg fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                </path>
+              </svg>
+            </button>
+            <button class="layout-btn active" id="layout-list-btn" aria-label="List View">
+              <svg fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                  d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </button>
+          </div>
+      </div>
+    </div>
+
+      <!-- Expanded Filter Panel -->
+      <div class="filter-panel" id="filter-panel">
+
+        <div class="filter-row">
+          <div class="filter-label">TAG</div>
+          <div class="filter-options" id="filter-tags">
+            <!-- Dynamically injected Tag buttons -->
+          </div>
+        </div>
+        <div class="filter-row sort-row">
+          <div class="filter-label">SORT</div>
+          <div class="filter-sort-controls">
+            <div class="select-wrapper">
+              <select id="sort-select" aria-label="Sort order">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="title-asc">Alphabetical (A-Z)</option>
+                <option value="title-desc">Alphabetical (Z-A)</option>
+              </select>
+            </div>
+            <button class="clear-all-btn" id="clear-all-btn">CLEAR ALL</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="blog-section animate-fade-in-up delay-5">
+        <div class="blog-grid" id="blog-grid">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Blog Article Reader View -->
+    <section class="reader-view" id="reader-view">
+      <!-- Injected via JavaScript -->
+    </section>
+
+  </main>
+
+
+
+  <!-- Code Script Hookups -->
+  <script src="posts.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

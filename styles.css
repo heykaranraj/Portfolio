@@ -1738,3 +1738,60 @@ body {
   z-index: -1;
   pointer-events: none;
 }
+
+/* Mobile-Responsive Optimizations (max-width: 600px) */
+@media (max-width: 600px) {
+  /* Container Padding Adjustments */
+  .container {
+    padding: 0 1.25rem;
+  }
+  .navbar .nav-container {
+    padding: 0 1.25rem;
+  }
+  
+  /* Hero Section Typography */
+  .hero h1 {
+    font-size: 2.2rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .hero-tagline {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+  .hero-desc {
+    font-size: 17px;
+    line-height: 1.55;
+    margin-top: 15px;
+  }
+  
+  /* Toolbar stack configuration */
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1.5rem 0;
+  }
+  .search-box {
+    max-width: 100%;
+  }
+  .toolbar-controls {
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  /* Year list header wrap spacing */
+  .list-year-section {
+    padding: 2.5rem 0 1rem;
+    align-items: baseline;
+  }
+  .list-year-title {
+    font-size: 3rem;
+  }
+  .list-post-row {
+    margin: 0 -1.25rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}

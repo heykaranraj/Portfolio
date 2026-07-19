@@ -1805,39 +1805,3 @@ body::before {
     padding-right: 1.25rem;
   }
 }
-
-/* Hero Social Links */
-.hero-socials {
-  margin-top: 1.5rem;
-  display: flex;
-  gap: 1rem;
-}
-
-.social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
-  background-color: var(--card-bg);
-  color: var(--text-secondary);
-  transition: var(--transition-smooth);
-}
-
-.social-link:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.1);
-}
-
-[data-theme="dark"] .social-link:hover {
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
-}
-
-.social-icon {
-  width: 20px;
-  height: 20px;
-}

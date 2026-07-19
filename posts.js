@@ -1,5 +1,78 @@
 const BLOG_POSTS = [
   {
+    id: "ml-powering-space-exploration",
+    title: "How Machine Learning is Powering the Next Generation of Space Exploration",
+    type: "ESSAY",
+    date: "19 JUL 2026",
+    coverImage: "assets/images/space_exploration.png",
+    summary: "From autonomous Mars rovers to deep-space navigation and exoplanet detection, machine learning is transforming how humanity explores the cosmos. We examine the current applications and future challenges of AI in space.",
+    readTime: "5 min read",
+    tags: ["#SPACE", "#AI", "#MACHINE-LEARNING", "#AUTONOMY", "#EXOPLANETS"],
+    content: `
+      <p class="lead">Imagine a spacecraft millions of kilometers away from Earth. It encounters an unexpected asteroid or a steep crater on Mars. Waiting for instructions from mission control isn't an option because communication can take several minutes or even hours. In moments like these, the spacecraft must make decisions on its own.</p>
+      
+      <p>This is where Machine Learning (ML) is transforming space exploration.</p>
+
+      <h2>Why Space Missions Need Machine Learning</h2>
+      <p>Every space mission generates enormous amounts of data. Satellites capture high-resolution images, telescopes observe distant galaxies, and spacecraft continuously monitor their own systems. Analyzing all this information manually would be nearly impossible. Machine Learning enables spacecraft to process data, recognize patterns, and make intelligent decisions in real time. Instead of depending entirely on engineers on Earth, modern space systems can operate with a high degree of autonomy.</p>
+
+      <h2>Autonomous Navigation: Teaching Spacecraft to Think</h2>
+      <p>One of the most exciting applications of ML is autonomous navigation.</p>
+      <p>Future spacecraft and planetary rovers use onboard cameras, LiDAR, sensors, and AI algorithms to understand their surroundings. They can detect rocks, avoid obstacles, optimize routes, and safely navigate unfamiliar terrain without waiting for commands from Earth.</p>
+      <p>This capability is especially important for deep-space missions, where communication delays make real-time human control impossible.</p>
+
+      <h2>Smarter Planetary Rovers</h2>
+      <p>NASA's Mars rovers are excellent examples of machine learning in action.</p>
+      <p>Modern rovers can:</p>
+      <ul>
+        <li>Identify interesting rock formations.</li>
+        <li>Detect hazards like craters and large boulders.</li>
+        <li>Choose safer paths.</li>
+        <li>Prioritize scientific targets automatically.</li>
+      </ul>
+      <p>Instead of simply following pre-programmed instructions, these robots continuously analyze their environment and make intelligent decisions based on incoming data.</p>
+
+      <h2>Seeing Patterns Humans Might Miss</h2>
+      <p>Space telescopes generate millions of astronomical images every year.</p>
+      <p>Machine learning models help astronomers identify galaxies, classify celestial objects, detect unusual cosmic events, and even discover planets orbiting distant stars.</p>
+      <p>These algorithms can process years of observational data in a fraction of the time it would take human researchers, accelerating scientific discovery.</p>
+
+      <h2>Predicting Problems Before They Happen</h2>
+      <p>Another powerful application is predictive maintenance.</p>
+      <p>Every spacecraft contains thousands of components that operate under extreme conditions.</p>
+      <p>Machine learning continuously monitors system health by analyzing sensor data such as:</p>
+      <ul>
+        <li>Temperature</li>
+        <li>Pressure</li>
+        <li>Voltage</li>
+        <li>Fuel levels</li>
+        <li>Vibration</li>
+      </ul>
+      <p>If the system detects unusual behavior, it can predict potential failures before they become mission-threatening, allowing corrective action to be taken early.</p>
+
+      <h2>Discovering New Worlds</h2>
+      <p>One of the most fascinating uses of machine learning is the search for exoplanets.</p>
+      <p>When a planet passes in front of its host star, the star's brightness decreases slightly. These tiny changes are often too subtle for manual analysis across millions of observations.</p>
+      <p>Machine learning algorithms analyze these light curves, identify possible planets, eliminate false detections, and help astronomers discover new worlds faster than ever before.</p>
+
+      <h2>Challenges Ahead</h2>
+      <p>Despite its incredible potential, machine learning in space exploration still faces several challenges:</p>
+      <ul>
+        <li>Limited computing power onboard spacecraft</li>
+        <li>Communication delays with Earth</li>
+        <li>Noisy or incomplete sensor data</li>
+        <li>The need for highly reliable decision-making in extreme environments</li>
+      </ul>
+      <p>As hardware becomes more efficient and AI algorithms continue to improve, these challenges are gradually being addressed.</p>
+
+      <h2>The Future of Intelligent Space Exploration</h2>
+      <p>The next generation of space missions will rely even more heavily on artificial intelligence and machine learning.</p>
+      <p>Future spacecraft won't simply follow commands—they will learn from their surroundings, adapt to unexpected situations, optimize their own performance, and assist scientists in making discoveries that were once impossible.</p>
+      <p>Machine learning is no longer just a supporting technology in space exploration.</p>
+      <p>It is becoming the intelligence that enables humanity to explore farther, safer, and smarter than ever before.</p>
+    `
+  },
+  {
     id: "beating-market-human-psychology-emh",
     title: "Why Beating the Market is Hard: Human Psychology, and the Efficient Market Hypothesis",
     type: "ESSAY",

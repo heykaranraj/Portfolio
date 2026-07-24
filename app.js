@@ -523,8 +523,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Increment view counter
-    const currentViews = incrementPostViews(postId);
+    // Fetch cached/initial view count for initial render
+    const currentViews = getPostViews(postId);
     const comments = getPostComments(postId);
 
     const postIndex = window.BLOG_POSTS.findIndex(p => p.id === postId);

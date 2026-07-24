@@ -186,11 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return incrementPostViews(postId);
   };
 
-  const incrementPostViews = (postId) => {
-    const currentViews = getPostViews(postId);
-    const updatedViews = currentViews + 1;
-    localStorage.setItem(`blog_views_${postId}`, updatedViews.toString());
-    return updatedViews;
+  const hasUserViewedPost = (postId) => {
+    return sessionStorage.getItem(`viewed_blog_${postId}`) === 'true';
+  };
+
+  const markPostAsViewed = (postId) => {
+    sessionStorage.setItem(`viewed_blog_${postId}`, 'true');
   };
 
   const getPostComments = (postId) => {
@@ -634,13 +635,23 @@ document.addEventListener('DOMContentLoaded', () => {
       el.style.transitionDelay = `${(idx % 4) * 0.05}s`;
     });
 
-    // Asynchronously increment & update live global view count
-    incrementGlobalViews(postId).then(liveCount => {
-      const valEl = document.getElementById('post-view-count-val');
-      if (valEl) {
-        valEl.textContent = liveCount;
-      }
-    });
+    // Only increment view count once per unique session; otherwise fetch live count without incrementing
+    if (!hasUserViewedPost(postId)) {
+      markPostAsViewed(postId);
+      incrementGlobalViews(postId).then(liveCount => {
+        const valEl = document.getElementById('post-view-count-val');
+        if (valEl) {
+          valEl.textContent = liveCount;
+        }
+      });
+    } else {
+      fetchGlobalViews(postId).then(liveCount => {
+        const valEl = document.getElementById('post-view-count-val');
+        if (valEl) {
+          valEl.textContent = liveCount;
+        }
+      });
+    }
 
     // Bind reader back button to restore route
     document.getElementById('reader-back-btn').addEventListener('click', () => {

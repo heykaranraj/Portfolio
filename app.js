@@ -154,6 +154,38 @@ document.addEventListener('DOMContentLoaded', () => {
     return defaultVal;
   };
 
+  const fetchGlobalViews = async (postId) => {
+    try {
+      const res = await fetch(`https://api.counterapi.dev/v1/techblogs-${postId}/views/`);
+      if (res.ok) {
+        const data = await res.json();
+        const base = DEFAULT_VIEWS[postId] || 100;
+        const total = base + (data.count || 0);
+        localStorage.setItem(`blog_views_${postId}`, total.toString());
+        return total;
+      }
+    } catch (e) {
+      console.warn('Live counter API offline, using cached count:', e);
+    }
+    return getPostViews(postId);
+  };
+
+  const incrementGlobalViews = async (postId) => {
+    try {
+      const res = await fetch(`https://api.counterapi.dev/v1/techblogs-${postId}/views/up/`);
+      if (res.ok) {
+        const data = await res.json();
+        const base = DEFAULT_VIEWS[postId] || 100;
+        const total = base + (data.count || 0);
+        localStorage.setItem(`blog_views_${postId}`, total.toString());
+        return total;
+      }
+    } catch (e) {
+      console.warn('Live counter API offline, using local increment:', e);
+    }
+    return incrementPostViews(postId);
+  };
+
   const incrementPostViews = (postId) => {
     const currentViews = getPostViews(postId);
     const updatedViews = currentViews + 1;
@@ -529,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
               <div class="meta-col">
                 <div class="meta-label">VIEWS</div>
-                <div class="meta-value view-count-badge"><span class="view-icon">👁️</span> ${currentViews}</div>
+                <div class="meta-value view-count-badge"><span class="view-icon">👁️</span> <span id="post-view-count-val">${currentViews}</span></div>
               </div>
               <div class="meta-col">
                 <div class="meta-label">KIND</div>
@@ -600,6 +632,14 @@ document.addEventListener('DOMContentLoaded', () => {
     contentElements.forEach((el, idx) => {
       el.classList.add('reveal-item');
       el.style.transitionDelay = `${(idx % 4) * 0.05}s`;
+    });
+
+    // Asynchronously increment & update live global view count
+    incrementGlobalViews(postId).then(liveCount => {
+      const valEl = document.getElementById('post-view-count-val');
+      if (valEl) {
+        valEl.textContent = liveCount;
+      }
     });
 
     // Bind reader back button to restore route

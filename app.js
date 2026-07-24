@@ -24,6 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let readingProgressBar = null;
 
+  // Auto-purge stale mock cache from previous deployments
+  const CURRENT_CACHE_VER = 'v3_real_live_data';
+  if (localStorage.getItem('techblogs_cache_ver') !== CURRENT_CACHE_VER) {
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('blog_comments_') || key.startsWith('blog_views_') || key.startsWith('blog_comment_ids_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    localStorage.setItem('techblogs_cache_ver', CURRENT_CACHE_VER);
+  }
+
   // Application State
   let state = {
     searchQuery: '',

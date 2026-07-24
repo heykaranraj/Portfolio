@@ -406,6 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="card-content">
           <div class="card-meta">
             <span class="card-type">${post.type}</span>
+            ${post.doi ? `<span class="doi-pill">DOI: 10.5281/zenodo.21526230</span>` : ''}
             <span class="card-date">${cardDate}</span>
           </div>
           <h2 class="card-title">${post.title}</h2>
@@ -552,6 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="meta-label">KIND</div>
                 <div class="meta-value">${post.type}</div>
               </div>
+              ${post.doi ? `
+              <div class="meta-col">
+                <div class="meta-label">DOI</div>
+                <div class="meta-value"><a href="${post.doi}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color); text-decoration: underline;">${post.doi.replace('https://doi.org/', '')}</a></div>
+              </div>` : ''}
               <div class="meta-col">
                 <div class="meta-label">TAGS</div>
                 <div class="meta-value">${post.tags.map(t => t.replace('#', '')).join(', ')}</div>

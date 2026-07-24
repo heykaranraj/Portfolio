@@ -1,5 +1,64 @@
 const BLOG_POSTS = [
   {
+    id: "cryptographic-hash-chaining-live-video-tamper-evidence",
+    title: "A Cryptographic Hash-Chaining Framework for Real-Time Tamper-Evidence in Live Video Streams",
+    type: "RESEARCH PAPER",
+    date: "24 JUL 2026",
+    doi: "https://doi.org/10.5281/zenodo.21526230",
+    coverImage: "assets/images/crypto_video_verification.png",
+    summary: "The rapid advancement of generative AI has significantly increased the difficulty of verifying live video evidence. We propose a cryptographic evidence pipeline framework combining SHA-256 frame hashing, DCT/wavelet perceptual hashing, metadata binding, Merkle tree aggregation, and hardware-protected digital signatures to deliver deterministic, real-time tamper-evidence.",
+    readTime: "12 min read",
+    tags: ["#CRYPTOGRAPHY", "#DIGITAL-FORENSICS", "#VIDEO-AUTH", "#MERKLE-TREES", "#HARDWARE-SECURITY"],
+    content: `
+      <p class="lead">The rapid advancement of generative artificial intelligence has significantly increased the difficulty of verifying the authenticity of live video evidence. Existing forensic approaches primarily perform post-capture analysis and often lack mechanisms for continuous integrity verification during acquisition. This paper proposes a cryptographic evidence pipeline framework for detecting manipulation and verifying the authenticity of AI-manipulated live video.</p>
+
+      <div class="doi-banner-box" style="margin: 1.5rem 0; padding: 1.25rem; background: rgba(59, 130, 246, 0.08); border: 1px solid var(--border-focus); border-radius: 8px;">
+        <div style="font-weight: 700; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-color); letter-spacing: 0.05em;">Published Research Paper</div>
+        <div style="font-size: 1.1rem; font-weight: 600; margin-top: 0.25rem;">DOI: <a href="https://doi.org/10.5281/zenodo.21526230" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color); text-decoration: underline;">10.5281/zenodo.21526230 ↗</a></div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Author: <strong>Karan</strong> (Founder, Entangle &bull; krkaranraj.me@gmail.com)</div>
+      </div>
+
+      <h2>1. Introduction & Background</h2>
+      <p>Live video has become a primary medium for journalism, remote interviews, legal evidence, and insurance documentation. However, its credibility is increasingly under threat due to powerful real-time manipulation tools such as deepfakes, frame splicing, and object removal.</p>
+      <p>Existing solutions have notable limitations. AI-based deepfake detectors are probabilistic and frequently fail against evolving forgery techniques. Traditional metadata approaches, including EXIF tags and standards such as C2PA, can be stripped or forged with relative ease. Consequently, there is a clear need for robust, cryptographically grounded mechanisms capable of verifying authenticity directly at the point of capture.</p>
+
+      <h2>2. Proposed Dual-Hashing Framework</h2>
+      <p>Our proposed framework provides strong tamper-evidence by cryptographically linking every frame of a live video stream to both the capturing device and the preceding frames. During recording, each frame is processed through a dual hashing approach:</p>
+      <ul>
+        <li><strong>Cryptographic Hashing:</strong> SHA-256 is applied to the raw frame bytes (or selected keyframe data). This produces a bit-exact fingerprint, ensuring that even a single-pixel modification results in a drastically different hash value.</li>
+        <li><strong>Perceptual Hashing:</strong> A perceptual image hash (pHash based on DCT or wavelet features) is computed to detect semantically significant changes, such as face replacements, while tolerating benign transformations like compression or minor color adjustments.</li>
+      </ul>
+
+      <h2>3. Mathematical Formulation of Frame Hash-Chaining</h2>
+      <p>The resulting hashes are combined with the previous frame's hash and contextual metadata, including timestamps, GPS coordinates, accelerometer data, and optional challenge-response prompts (e.g., "show your ID" or "state today's date"). Formally, the chained hash is defined as:</p>
+      <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 8px; font-family: monospace; font-size: 1.1rem; text-align: center; margin: 1.5rem 0;">
+        H_i = SHA256( H_{i-1}  ||  c_i  ||  p_i  ||  M_i )
+      </div>
+      <p>Where <em>c_i = SHA256(F_i)</em> is the cryptographic frame hash, <em>p_i = pHash(F_i)</em> is the perceptual frame hash, and <em>M_i</em> is the bound metadata. Any tampering, insertion, or deletion of frames breaks this chain, similar to the principle used in blockchain or Lamport hash sequences.</p>
+
+      <h2>4. Merkle Tree Aggregation & Hardware-Protected Signatures</h2>
+      <p>Frames are grouped into blocks of size <em>N</em> (e.g., <em>N = 1000</em>). For each block, a Merkle tree is constructed over the chained hashes, and the Merkle root is digitally signed using a hardware-protected key on the device (using Android StrongBox TEE or iOS Secure Enclave CryptoKit).</p>
+      <p>While the live video is streamed or recorded in the usual manner, a lightweight parallel proof stream carries the hash values, signatures, and anchoring references. Verifiers can then cross-check the received video against these proofs to confirm that no frames have been altered, inserted, or removed.</p>
+
+      <h2>5. Threat Model & Security Properties</h2>
+      <p>We consider a strong adversary capable of intercepting and modifying video content after capture:</p>
+      <ul>
+        <li><strong>Content Adversary:</strong> Attempts frame insertion, deletion, or replacement. Prevented because any change to <em>F_i</em> alters <em>c_i</em> and <em>H_i</em>, breaking the entire downstream chain.</li>
+        <li><strong>Timing & Metadata Adversary:</strong> Attempts to delay packets or spoof GPS/timestamp metadata. Prevented because metadata is cryptographically bound into each frame's hash.</li>
+        <li><strong>Credential Adversary:</strong> Attempts to forge signatures. Prevented by hardware secure enclaves (TEE/TPM) ensuring private keys cannot be extracted.</li>
+      </ul>
+
+      <h2>6. Implementation & Real-World Integration</h2>
+      <p>The proposed framework is engineered for real-time execution on commodity devices such as smartphones and webcams. It integrates seamlessly with modern AI platforms (e.g., Google Gemini live camera mode) without introducing noticeable latency (hashing a 720p frame takes ~10ms on mid-range smartphones with <6% CPU overhead).</p>
+
+      <h2>7. DOI Link & Paper Citation</h2>
+      <p>Read the official published paper and access full experimental datasets via Zenodo:</p>
+      <p><a href="https://doi.org/10.5281/zenodo.21526230" target="_blank" rel="noopener noreferrer" class="submit-comment-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; width: auto;">
+        View Official DOI Paper on Zenodo (10.5281/zenodo.21526230) ↗
+      </a></p>
+    `
+  },
+  {
     id: "nvidias-vision-physical-ai-healthcare",
     title: "NVIDIA's Vision for Physical AI in Healthcare: Building the Foundation for Autonomous Surgical Robotics",
     type: "ESSAY",

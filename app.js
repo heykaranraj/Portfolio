@@ -106,93 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'beating-market-human-psychology-emh': 516
   };
 
-  const DEFAULT_COMMENTS = {
-    'nvidias-vision-physical-ai-healthcare': [
-      {
-        id: 1,
-        author: 'Dr. Aris Thorne',
-        date: '24 JUL 2026',
-        content: 'Cosmos-H-Surgical creating synthetic video-action pairs via inverse dynamics is a brilliant approach to bypass the physical robot telemetry bottleneck.',
-        avatar: 'A'
-      },
-      {
-        id: 2,
-        author: 'Elena Rostova',
-        date: '24 JUL 2026',
-        content: 'Isaac Sim digital twins for operating rooms will dramatically accelerate FDA validation cycles before physical trials.',
-        avatar: 'E'
-      }
-    ],
-    'ml-powering-space-exploration': [
-      {
-        id: 1,
-        author: 'Marcus Vance',
-        date: '19 JUL 2026',
-        content: 'The autonomous obstacle detection on Mars rovers is truly fascinating. Edge inference under harsh space conditions is the future.',
-        avatar: 'M'
-      }
-    ],
-    'beating-market-human-psychology-emh': [
-      {
-        id: 1,
-        author: 'Sarah Lin',
-        date: '17 JUL 2026',
-        content: 'Sharpe Ratio over absolute returns any day! Emotional discipline is what separates long-term survivors from gamblers.',
-        avatar: 'S'
-      }
-    ]
-  };
-
-  const getPostViews = (postId) => {
-    const key = `blog_views_${postId}`;
-    const stored = localStorage.getItem(key);
-    if (stored !== null) {
-      return parseInt(stored, 10);
-    }
-    const defaultVal = DEFAULT_VIEWS[postId] || 100;
-    localStorage.setItem(key, defaultVal.toString());
-    return defaultVal;
-  };
-
-  const fetchGlobalViews = async (postId) => {
-    try {
-      const res = await fetch(`https://api.counterapi.dev/v1/techblogs-${postId}/views/`);
-      if (res.ok) {
-        const data = await res.json();
-        const base = DEFAULT_VIEWS[postId] || 100;
-        const total = base + (data.count || 0);
-        localStorage.setItem(`blog_views_${postId}`, total.toString());
-        return total;
-      }
-    } catch (e) {
-      console.warn('Live counter API offline, using cached count:', e);
-    }
-    return getPostViews(postId);
-  };
-
-  const incrementGlobalViews = async (postId) => {
-    try {
-      const res = await fetch(`https://api.counterapi.dev/v1/techblogs-${postId}/views/up/`);
-      if (res.ok) {
-        const data = await res.json();
-        const base = DEFAULT_VIEWS[postId] || 100;
-        const total = base + (data.count || 0);
-        localStorage.setItem(`blog_views_${postId}`, total.toString());
-        return total;
-      }
-    } catch (e) {
-      console.warn('Live counter API offline, using local increment:', e);
-    }
-    return incrementPostViews(postId);
-  };
-
-  const hasUserViewedPost = (postId) => {
-    return sessionStorage.getItem(`viewed_blog_${postId}`) === 'true';
-  };
-
-  const markPostAsViewed = (postId) => {
-    sessionStorage.setItem(`viewed_blog_${postId}`, 'true');
-  };
+  const DEFAULT_COMMENTS = {};
 
   const getPostComments = (postId) => {
     const key = `blog_comments_${postId}`;
@@ -204,18 +118,93 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Failed to parse comments', e);
       }
     }
-    const defaults = DEFAULT_COMMENTS[postId] || [];
-    localStorage.setItem(key, JSON.stringify(defaults));
-    return defaults;
+    return [];
   };
 
-  const savePostComments = (postId, comments) => {
-    localStorage.setItem(`blog_comments_${postId}`, JSON.stringify(comments));
+  const fetchLiveComments = async (postId) => {
+    const cacheKey = `blog_comments_${postId}`;
+    const commentIdsKey = `blog_comment_ids_${postId}`;
+    let commentIds = [];
+    try {
+      commentIds = JSON.parse(localStorage.getItem(commentIdsKey) || '[]');
+    } catch (e) {}
+
+    if (commentIds.length > 0) {
+      try {
+        const idParams = commentIds.map(id => `id=${id}`).join('&');
+        const res = await fetch(`https://api.restful-api.dev/objects?${idParams}`);
+        if (res.ok) {
+          const dataList = await res.json();
+          const liveComments = dataList.map(item => ({
+            id: item.id,
+            author: item.data.author,
+            date: item.data.date,
+            content: item.data.content,
+            avatar: item.data.avatar || item.data.author.charAt(0).toUpperCase()
+          }));
+          localStorage.setItem(cacheKey, JSON.stringify(liveComments));
+          return liveComments;
+        }
+      } catch (err) {
+        console.warn('Live comments fetch error, using local cache:', err);
+      }
+    }
+
+    return getPostComments(postId);
+  };
+
+  const postLiveComment = async (postId, author, content) => {
+    const cleanAuthor = author.trim();
+    const cleanContent = content.trim();
+    const dateStr = 'Just now';
+    
+    const commentData = {
+      postId: postId,
+      author: cleanAuthor,
+      content: cleanContent,
+      date: dateStr,
+      avatar: cleanAuthor.charAt(0).toUpperCase()
+    };
+
+    let newCommentObj = {
+      id: Date.now().toString(),
+      ...commentData
+    };
+
+    try {
+      const res = await fetch('https://api.restful-api.dev/objects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `techblogs_comment_${postId}`,
+          data: commentData
+        })
+      });
+      if (res.ok) {
+        const resData = await res.json();
+        if (resData && resData.id) {
+          newCommentObj.id = resData.id;
+          
+          const commentIdsKey = `blog_comment_ids_${postId}`;
+          const currentIds = JSON.parse(localStorage.getItem(commentIdsKey) || '[]');
+          currentIds.unshift(resData.id);
+          localStorage.setItem(commentIdsKey, JSON.stringify(currentIds));
+        }
+      }
+    } catch (e) {
+      console.warn('Live post comment error, saving locally:', e);
+    }
+
+    const cacheKey = `blog_comments_${postId}`;
+    const currentComments = getPostComments(postId);
+    currentComments.unshift(newCommentObj);
+    localStorage.setItem(cacheKey, JSON.stringify(currentComments));
+    return currentComments;
   };
 
   const renderCommentsListHTML = (comments) => {
     if (!comments || comments.length === 0) {
-      return `<div class="no-comments-notice">Be the first to share your thoughts on this article!</div>`;
+      return `<div class="no-comments-notice">No comments yet. Be the first to join the discussion!</div>`;
     }
     return comments.map(c => `
       <div class="comment-card reveal-item">
@@ -658,10 +647,23 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.hash = '';
     });
 
-    // Form listener for adding a new comment
+    // Asynchronously fetch live global comments
+    fetchLiveComments(postId).then(liveComments => {
+      const commentsContainer = document.getElementById('comments-list-container');
+      const countBadge = document.getElementById('comments-count-badge');
+      if (commentsContainer) {
+        commentsContainer.innerHTML = renderCommentsListHTML(liveComments);
+      }
+      if (countBadge) {
+        countBadge.textContent = liveComments.length;
+      }
+      setupScrollReveal();
+    });
+
+    // Form listener for adding a new comment live
     const commentForm = document.getElementById('add-comment-form');
     if (commentForm) {
-      commentForm.addEventListener('submit', (e) => {
+      commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const authorInput = document.getElementById('comment-author-input');
         const textInput = document.getElementById('comment-text-input');
@@ -670,26 +672,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!author || !content) return;
 
-        const currentComments = getPostComments(postId);
-        const newComment = {
-          id: Date.now(),
-          author: author,
-          date: 'Just now',
-          content: content,
-          avatar: author.charAt(0).toUpperCase()
-        };
-
-        currentComments.unshift(newComment);
-        savePostComments(postId, currentComments);
+        const updatedComments = await postLiveComment(postId, author, content);
 
         // Re-render comments list dynamically
         const commentsContainer = document.getElementById('comments-list-container');
         const countBadge = document.getElementById('comments-count-badge');
         if (commentsContainer) {
-          commentsContainer.innerHTML = renderCommentsListHTML(currentComments);
+          commentsContainer.innerHTML = renderCommentsListHTML(updatedComments);
         }
         if (countBadge) {
-          countBadge.textContent = currentComments.length;
+          countBadge.textContent = updatedComments.length;
         }
 
         // Reset form inputs

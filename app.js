@@ -99,6 +99,105 @@ document.addEventListener('DOMContentLoaded', () => {
     return new Date(year, month, 1);
   };
 
+  // View Counter & Comments Storage System
+  const DEFAULT_VIEWS = {
+    'nvidias-vision-physical-ai-healthcare': 142,
+    'ml-powering-space-exploration': 342,
+    'beating-market-human-psychology-emh': 516
+  };
+
+  const DEFAULT_COMMENTS = {
+    'nvidias-vision-physical-ai-healthcare': [
+      {
+        id: 1,
+        author: 'Dr. Aris Thorne',
+        date: '24 JUL 2026',
+        content: 'Cosmos-H-Surgical creating synthetic video-action pairs via inverse dynamics is a brilliant approach to bypass the physical robot telemetry bottleneck.',
+        avatar: 'A'
+      },
+      {
+        id: 2,
+        author: 'Elena Rostova',
+        date: '24 JUL 2026',
+        content: 'Isaac Sim digital twins for operating rooms will dramatically accelerate FDA validation cycles before physical trials.',
+        avatar: 'E'
+      }
+    ],
+    'ml-powering-space-exploration': [
+      {
+        id: 1,
+        author: 'Marcus Vance',
+        date: '19 JUL 2026',
+        content: 'The autonomous obstacle detection on Mars rovers is truly fascinating. Edge inference under harsh space conditions is the future.',
+        avatar: 'M'
+      }
+    ],
+    'beating-market-human-psychology-emh': [
+      {
+        id: 1,
+        author: 'Sarah Lin',
+        date: '17 JUL 2026',
+        content: 'Sharpe Ratio over absolute returns any day! Emotional discipline is what separates long-term survivors from gamblers.',
+        avatar: 'S'
+      }
+    ]
+  };
+
+  const getPostViews = (postId) => {
+    const key = `blog_views_${postId}`;
+    const stored = localStorage.getItem(key);
+    if (stored !== null) {
+      return parseInt(stored, 10);
+    }
+    const defaultVal = DEFAULT_VIEWS[postId] || 100;
+    localStorage.setItem(key, defaultVal.toString());
+    return defaultVal;
+  };
+
+  const incrementPostViews = (postId) => {
+    const currentViews = getPostViews(postId);
+    const updatedViews = currentViews + 1;
+    localStorage.setItem(`blog_views_${postId}`, updatedViews.toString());
+    return updatedViews;
+  };
+
+  const getPostComments = (postId) => {
+    const key = `blog_comments_${postId}`;
+    const stored = localStorage.getItem(key);
+    if (stored !== null) {
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        console.error('Failed to parse comments', e);
+      }
+    }
+    const defaults = DEFAULT_COMMENTS[postId] || [];
+    localStorage.setItem(key, JSON.stringify(defaults));
+    return defaults;
+  };
+
+  const savePostComments = (postId, comments) => {
+    localStorage.setItem(`blog_comments_${postId}`, JSON.stringify(comments));
+  };
+
+  const renderCommentsListHTML = (comments) => {
+    if (!comments || comments.length === 0) {
+      return `<div class="no-comments-notice">Be the first to share your thoughts on this article!</div>`;
+    }
+    return comments.map(c => `
+      <div class="comment-card reveal-item">
+        <div class="comment-avatar">${c.avatar || c.author.charAt(0).toUpperCase()}</div>
+        <div class="comment-body">
+          <div class="comment-meta">
+            <span class="comment-author-name">${c.author}</span>
+            <span class="comment-date">${c.date}</span>
+          </div>
+          <div class="comment-content-text">${c.content}</div>
+        </div>
+      </div>
+    `).join('');
+  };
+
   // Compile unique tags dynamically from the posts database
   const updateFilterPills = () => {
     const posts = window.BLOG_POSTS;
@@ -284,6 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="card-meta">
             <span class="card-type">${post.type}</span>
             <span class="card-date">${cardDate}</span>
+            <span class="card-views">👁️ ${getPostViews(post.id)}</span>
           </div>
           <h2 class="card-title">${post.title}</h2>
           <p class="card-desc">${post.summary}</p>
@@ -363,8 +463,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Increment view counter
+    const currentViews = incrementPostViews(postId);
+    const comments = getPostComments(postId);
+
     const postIndex = window.BLOG_POSTS.findIndex(p => p.id === postId);
-    const indexStr = String(postIndex + 1).padStart(2, '0');
     const minutes = post.readTime.split(' ')[0];
 
     const dateParts = post.date.split(' ');
@@ -411,7 +514,6 @@ document.addEventListener('DOMContentLoaded', () => {
               WRITING <span class="slash">/</span> ${post.title.toUpperCase()}
             </div>
 
-            
             <h1 class="reader-title">${post.title}</h1>
             
             <p class="reader-summary">${post.summary}</p>
@@ -424,6 +526,10 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="meta-col">
                 <div class="meta-label">READING</div>
                 <div class="meta-value">${minutes} <span class="accent-text-orange">min</span></div>
+              </div>
+              <div class="meta-col">
+                <div class="meta-label">VIEWS</div>
+                <div class="meta-value view-count-badge"><span class="view-icon">👁️</span> ${currentViews}</div>
               </div>
               <div class="meta-col">
                 <div class="meta-label">KIND</div>
@@ -453,11 +559,44 @@ document.addEventListener('DOMContentLoaded', () => {
         <article class="reader-content">
           ${post.content}
         </article>
+
+        <!-- Interactive Comments Section -->
+        <section class="comments-section">
+          <div class="comments-header">
+            <h3 class="comments-title">
+              Discussion <span class="comments-badge" id="comments-count-badge">${comments.length}</span>
+            </h3>
+          </div>
+
+          <!-- New Comment Form Card -->
+          <div class="comment-form-card">
+            <form id="add-comment-form">
+              <div class="comment-form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="comment-author-input">Your Name</label>
+                  <input type="text" id="comment-author-input" class="form-input" placeholder="e.g. Alex Morgan" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="comment-text-input">Your Comment</label>
+                  <textarea id="comment-text-input" class="form-textarea" rows="3" placeholder="Share your thoughts on this article..." required></textarea>
+                </div>
+                <button type="submit" class="submit-comment-btn">
+                  Post Comment &rarr;
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Comments List Container -->
+          <div class="comments-list" id="comments-list-container">
+            ${renderCommentsListHTML(comments)}
+          </div>
+        </section>
       </div>
     `;
 
-    // Add scroll reveal class to all content paragraphs, subheadings, lists, code, and quotes
-    const contentElements = readerView.querySelectorAll('.reader-content > *, .reader-content li');
+    // Add scroll reveal class to all content paragraphs, subheadings, lists, code, quotes, and comments
+    const contentElements = readerView.querySelectorAll('.reader-content > *, .reader-content li, .comments-section');
     contentElements.forEach((el, idx) => {
       el.classList.add('reveal-item');
       el.style.transitionDelay = `${(idx % 4) * 0.05}s`;
@@ -467,6 +606,48 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('reader-back-btn').addEventListener('click', () => {
       window.location.hash = '';
     });
+
+    // Form listener for adding a new comment
+    const commentForm = document.getElementById('add-comment-form');
+    if (commentForm) {
+      commentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const authorInput = document.getElementById('comment-author-input');
+        const textInput = document.getElementById('comment-text-input');
+        const author = authorInput.value.trim();
+        const content = textInput.value.trim();
+
+        if (!author || !content) return;
+
+        const currentComments = getPostComments(postId);
+        const newComment = {
+          id: Date.now(),
+          author: author,
+          date: 'Just now',
+          content: content,
+          avatar: author.charAt(0).toUpperCase()
+        };
+
+        currentComments.unshift(newComment);
+        savePostComments(postId, currentComments);
+
+        // Re-render comments list dynamically
+        const commentsContainer = document.getElementById('comments-list-container');
+        const countBadge = document.getElementById('comments-count-badge');
+        if (commentsContainer) {
+          commentsContainer.innerHTML = renderCommentsListHTML(currentComments);
+        }
+        if (countBadge) {
+          countBadge.textContent = currentComments.length;
+        }
+
+        // Reset form inputs
+        authorInput.value = '';
+        textInput.value = '';
+
+        setupScrollReveal();
+      });
+    }
 
     setupScrollReveal();
   };

@@ -110,53 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return new Date(year, month, 1);
   };
 
-  const getPostViews = (postId) => {
-    const key = `blog_views_${postId}`;
-    const stored = localStorage.getItem(key);
-    if (stored !== null) {
-      return parseInt(stored, 10);
-    }
-    return 1;
-  };
-
-  const fetchGlobalViews = async (postId) => {
-    try {
-      const res = await fetch(`https://api.counterapi.dev/v1/techblogs-${postId}/views/`);
-      if (res.ok) {
-        const data = await res.json();
-        const liveCount = data.count || 1;
-        localStorage.setItem(`blog_views_${postId}`, liveCount.toString());
-        return liveCount;
-      }
-    } catch (e) {
-      console.warn('Live counter API offline, using cached count:', e);
-    }
-    return getPostViews(postId);
-  };
-
-  const incrementGlobalViews = async (postId) => {
-    try {
-      const res = await fetch(`https://api.counterapi.dev/v1/techblogs-${postId}/views/up/`);
-      if (res.ok) {
-        const data = await res.json();
-        const liveCount = data.count || 1;
-        localStorage.setItem(`blog_views_${postId}`, liveCount.toString());
-        return liveCount;
-      }
-    } catch (e) {
-      console.warn('Live counter API offline, using local count:', e);
-    }
-    return getPostViews(postId);
-  };
-
-  const hasUserViewedPost = (postId) => {
-    return sessionStorage.getItem(`viewed_blog_${postId}`) === 'true';
-  };
-
-  const markPostAsViewed = (postId) => {
-    sessionStorage.setItem(`viewed_blog_${postId}`, 'true');
-  };
-
   const getPostComments = (postId) => {
     const key = `blog_comments_${postId}`;
     const stored = localStorage.getItem(key);
@@ -454,7 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="card-meta">
             <span class="card-type">${post.type}</span>
             <span class="card-date">${cardDate}</span>
-            <span class="card-views">👁️ ${getPostViews(post.id)}</span>
           </div>
           <h2 class="card-title">${post.title}</h2>
           <p class="card-desc">${post.summary}</p>
@@ -534,8 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Fetch cached/initial view count for initial render
-    const currentViews = getPostViews(postId);
     const comments = getPostComments(postId);
 
     const postIndex = window.BLOG_POSTS.findIndex(p => p.id === postId);
@@ -597,10 +547,6 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="meta-col">
                 <div class="meta-label">READING</div>
                 <div class="meta-value">${minutes} <span class="accent-text-orange">min</span></div>
-              </div>
-              <div class="meta-col">
-                <div class="meta-label">VIEWS</div>
-                <div class="meta-value view-count-badge"><span class="view-icon">👁️</span> <span id="post-view-count-val">${currentViews}</span></div>
               </div>
               <div class="meta-col">
                 <div class="meta-label">KIND</div>
@@ -672,24 +618,6 @@ document.addEventListener('DOMContentLoaded', () => {
       el.classList.add('reveal-item');
       el.style.transitionDelay = `${(idx % 4) * 0.05}s`;
     });
-
-    // Only increment view count once per unique session; otherwise fetch live count without incrementing
-    if (!hasUserViewedPost(postId)) {
-      markPostAsViewed(postId);
-      incrementGlobalViews(postId).then(liveCount => {
-        const valEl = document.getElementById('post-view-count-val');
-        if (valEl) {
-          valEl.textContent = liveCount;
-        }
-      });
-    } else {
-      fetchGlobalViews(postId).then(liveCount => {
-        const valEl = document.getElementById('post-view-count-val');
-        if (valEl) {
-          valEl.textContent = liveCount;
-        }
-      });
-    }
 
     // Bind reader back button to restore route
     document.getElementById('reader-back-btn').addEventListener('click', () => {
